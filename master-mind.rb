@@ -29,12 +29,7 @@ White
 Cyan
 =end
 
-# declare an array with the inital letter of the colors
-colors = %w(y o p b w c)
-
-# make the computer generate a random code based on the six possible colors
-code_to_find = colors.sample(4)
-
+# display some explanation for the player
 puts "Hello player! what is your buest guess for this mastermind game?"
 puts "Here are the 6 available colors"
 p "Yellow"
@@ -47,8 +42,14 @@ puts "Please make your guess using a combination of 4 colors"
 puts "Please use the initals of the colors to make your guess"
 puts "Example: WBOY for White Blue Orange Yellow"
 puts "Example 2: CYOG for Cyan Yellow Orange Green"
+puts "You have 12 tries, good luck!"
 puts "Let's go!"
 
+# declare an array with the inital letter of the colors
+colors = %w(yellow orange purple blue white cyan)
+
+# make the computer generate a random code based on the six possible colors
+code_to_find = colors.sample(4)
 
 board = Array.new(12) {Array.new(4)}
 
@@ -56,5 +57,12 @@ board.each do |v|
   p v
 end
 
-
-
+# make a loop that keeps asking for user guesses until they got the code or until
+# they run out of guesses
+time_to_stop = false
+until (time_to_stop)
+  puts "So darling what is your guess ?"
+  guess = gets.chomp.downcase
+  p guess.split()
+  p code_to_find
+end
