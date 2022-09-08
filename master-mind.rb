@@ -33,6 +33,28 @@ Cyan
 colors = %w(y o p b w c)
 
 # make the computer generate a random code based on the six possible colors
-random_code = colors.sample(4)
+code_to_find = colors.sample(4)
 
-p random_code
+puts "Hello player! what is your buest guess for this mastermind game?"
+puts "Here are the 6 available colors"
+p "Yellow"
+p "Orange"
+p "Blue"
+p "White"
+p "Cyan"
+p "Green"
+puts "Please make your guess using a combination of 4 colors"
+puts "Please use the initals of the colors to make your guess"
+puts "Example: WBOY for White Blue Orange Yellow"
+puts "Example 2: CYOG for Cyan Yellow Orange Green"
+puts "Let's go!"
+
+
+board = Array.new(12) {Array.new(4)}
+
+board.each do |v|
+  p v
+end
+
+
+
