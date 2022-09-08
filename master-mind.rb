@@ -1,4 +1,5 @@
-pseudo code:
+=begin
+begin pseudo code:
 
 Build the game assuming the computer randomly selects the secret colors
 and the human player must guess them. Remember that you need to give the
@@ -20,5 +21,18 @@ the array of the feedback shows 0 if the color is not present in the
 code, 1 if the color is present but it the wrong spot and 2 if
 the color is present and in the right spot
 
+Yellow
+Orange
+Purple
+Blue
+White
+Cyan
+=end
 
+# declare an array with the inital letter of the colors
+colors = %w(y o p b w c)
 
+# make the computer generate a random code based on the six possible colors
+random_code = colors.sample(4)
+
+p random_code
