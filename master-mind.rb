@@ -31,38 +31,53 @@ Cyan
 
 # display some explanation for the player
 puts "Hello player! what is your buest guess for this mastermind game?"
-puts "Here are the 6 available colors"
-p "Yellow"
-p "Orange"
-p "Blue"
-p "White"
-p "Cyan"
-p "Green"
-puts "Please make your guess using a combination of 4 colors"
-puts "Please use the initals of the colors to make your guess"
-puts "Example: WBOY for White Blue Orange Yellow"
-puts "Example 2: CYOG for Cyan Yellow Orange Green"
+puts "Please make your guess using a combination of 4 colors seperated with spaces"
+puts "Example: Green yellow blue white"
+puts "Or: cyan white blue orange"
 puts "You have 12 tries, good luck!"
 puts "Let's go!"
 
-# declare an array with the inital letter of the colors
+# declare an array with the colors available
 colors = %w(yellow orange purple blue white cyan)
 
 # make the computer generate a random code based on the six possible colors
 code_to_find = colors.sample(4)
 
-board = Array.new(12) {Array.new(4)}
-
-board.each do |v|
-  p v
-end
+# # declare a board made of arrays with nil elements and print it
+# board = Array.new(12) {Array.new(4)}
+# board.each do |v|
+#   p v
+# end
 
 # make a loop that keeps asking for user guesses until they got the code or until
 # they run out of guesses
 time_to_stop = false
+player_found_code = false
+guesses_left = 12
 until (time_to_stop)
+  if guesses_left < 12
+    puts "Not yet! try again! you have #{guesses_left} guesses left!"
+  end
+  puts "Remember, the possible colors are: #{colors}"
   puts "So darling what is your guess ?"
-  guess = gets.chomp.downcase
-  p guess.split()
+  guess = gets.chomp.downcase.split
+  # compare guess and code to find
+  feedback_array = []
+  guess.each_with_index do |color, index|
+    if code_to_find.index(color) == index then feedback_array << 2
+    elsif code_to_find.include?(color) && code_to_find.index(color) != index then feedback_array << 1
+    else feedback_array << 0
+    end
+  end
+  p guess
   p code_to_find
+  p feedback_array.shuffle
+  if feedback_array.join == '2222'
+    puts "Congratulations, you cracked the code!"
+    time_to_stop = true
+  end
+  guesses_left -= 1
+  if guesses_left == 0 then time_to_stop = true end
 end
+
+
