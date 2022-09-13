@@ -17,11 +17,27 @@ puts "Got it?"
 puts "Coool! Let's go!"
 puts "You have 12 tries, good luck!"
 
+# class Board
+#   def initialize(rows, columns)
+#     @rows = rows
+#     @columns = columns
+#     @board = Array.new(rows) {Array.new(columns)}
+#   end
+
+#   def display_board
+#     @board.each {|row| p row}
+#   end
+# end
+
+# my_master_board = Board.new(12, 4)
+# my_master_board.display_board
+
 class Mastermind
   def initialize
     @player_found_code = false
     @guesses_left = 12
     @colors = %w(yellow orange purple blue white cyan)
+    @computer_code = @colors.sample(4)
   end
 
   def get_user_input
@@ -31,8 +47,11 @@ class Mastermind
     gets.chomp.downcase.split
   end
 
-  def gen_computer_code
-    @colors.sample(4)
+  def input_valid?(input)
+    bolleaned_input = input.map do |color|
+      p @colors.include?(color)
+    end
+    !bolleaned_input.include?(false) && bolleaned_input.length == 4
   end
 
   def gen_user_code
@@ -56,28 +75,29 @@ class Mastermind
     feedback.count(2) == 4
   end
 
-  def player_won
-    puts "Congratulations"
-  end
-
   def gameover?
     @guesses_left == 0 || @player_found_code
   end
 
-  def play
-    code = gen_computer_code
+  def play_against_computer
     until gameover?
       guess = get_user_input
-      feedback = compare_guess_with_code(guess, code)
+      unless input_valid?(guess)
+        puts 'Mmh something is wrong with your input, please type 4 colors seperated with spaces'
+        puts 'Like so: yellow orange blue green'
+        next
+      end
+      feedback = compare_guess_with_code(guess, @computer_code)
       p code
-      p "Your guess was '#{guess.join(" ")}'"
-      p "And the feedback for your guess is #{feedback.sort.reverse}"
+      puts "Your guess was '#{guess.join(" ")}'"
+      puts "And the feedback for your guess is #{feedback.sort.reverse}"
       @guesses_left -= 1
       if code_cracked?(feedback)
-        @player_found_code = true end
+        @player_found_code = true
+      end
     end
   end
 end
 
 mastermind = Mastermind.new
-mastermind.play
+mastermind.play_against_computer
