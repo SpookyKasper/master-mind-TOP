@@ -1,44 +1,36 @@
-# display some explanation for the player
-puts
-puts "Hello player!"
-puts "Let's play mastermind!"
-puts
-puts "Instructions:"
-puts "Please make your guess using a combination of 4 colors seperated with spaces"
-puts "Example: orange yellow blue white"
-puts
-puts "Feedback will be given by an array of numbers"
-puts "A 2 means some color of the guess is present in the secret code and in the same place"
-puts "A 1 means some color is present but not in the same place"
-puts "A 0 means the color is not present in the secret code "
-puts "Example: imagine the code is 'yellow orange blue white'"
-puts "And your guess was           'orange purple blue yellow'"
-puts "You'll get a feedback of [2, 1, 1, 0]"
-puts "Feedback explanation:"
-puts "The '2' means one color (here the 'blue') is present and in the same place"
-puts "The two '1' mean two colors (here the yellow and orange) are present but not in the same place"
-puts "And finally the '0' means one of the colors (here the purple) is not present in the code"
-puts
-puts "Got it?"
-puts "Coool! Let's crack some codes!"
-puts "You have 12 tries, good luck!"
 
 class Mastermind
   def initialize(chances)
     @code_cracked = false
     @chances = chances
     @guesses_left = @chances
-    @colors = %w(yellow orange purple blue white cyan)
+    @colors = %w[yellow orange purple blue white cyan]
     @computer_code = @colors.sample(4)
     @user_code = nil
     @guesses_array = []
     @feedbacks_array = []
   end
 
-  def gen_user_code
-    puts "Pick four colors for your secret code"
-    puts "Remember the colors are #{@colors}"
-    gets.chomp.downcase.split
+  def print_intro
+    puts 'Instructions:'
+    puts 'Please make your guess using a combination of 4 colors seperated with spaces'
+    puts 'Example: orange yellow blue white'
+    puts
+    puts 'Feedback will be given by an array of numbers'
+    puts 'A 2 means some color of the guess is present in the secret code and in the same place'
+    puts 'A 1 means some color is present but not in the same place'
+    puts 'A 0 means the color is not present in the secret code '
+    puts "Example: imagine the code is 'yellow orange blue white'"
+    puts "And your guess was           'orange purple blue yellow'"
+    puts "You'll get a feedback of [2, 1, 1, 0]"
+    puts 'Feedback explanation:'
+    puts "The '2' means one color (here the 'blue') is present and in the same place"
+    puts "The two '1' mean two colors (here the yellow and orange) are present but not in the same place"
+    puts "And finally the '0' means one of the colors (here the purple) is not present in the code"
+    puts
+    puts 'Got it?'
+    puts "Coool! Let's crack some codes!"
+    puts 'You have 12 tries, good luck!'
   end
 
   def get_user_input
@@ -64,10 +56,11 @@ class Mastermind
   def compare_guess_with_code(guess, code)
     feedback = []
     guess.each_with_index do |color, index|
-      if code.index(color) == index then feedback << 2
-      elsif code.include?(color) && code.index(color) != index then feedback << 1
-      else feedback << 0
-      end
+      feedback << if code.index(color) == index then 2
+                  elsif code.include?(color) && code.index(color) != index then 1
+                  else
+                    0
+                  end
     end
     @feedbacks_array << feedback.sort.reverse
     feedback
@@ -82,24 +75,45 @@ class Mastermind
     puts
     while index < @guesses_array.length
       puts "Your pair guess & feedback for guess #{index + 1} was " +
-           @guesses_array[index].to_s + " " + @feedbacks_array[index].to_s
+           @guesses_array[index].to_s + ' ' + @feedbacks_array[index].to_s
       index += 1
     end
   end
 
-  def play_against_computer
+  def guesser
+    print_intro
     until gameover?
       guess = get_user_input
       feedback = compare_guess_with_code(guess, @computer_code)
       @guesses_left -= 1
       display_sofar
       if feedback.all?(2)
-        puts "Congratulations!! you cracked the code!!!"
-        @code_cracked = true
+        puts 'Congratulations!! you cracked the code!!!'
+          @code_cracked = true
       end
     end
   end
+
+  def gen_user_code
+    puts
+    puts "Coool! then let's get to it!"
+    puts 'Please pick four colors for your secret code'
+    puts "Remember the colors are #{@colors}"
+    gets.chomp.downcase.split
+  end
+
+  def creator
+    code = gen_user_code
+
+  end
 end
 
+puts
+puts 'Hello player!'
+puts "Let's play mastermind!"
+puts
+puts "Do you want to be the creator of the secret code ? or the guesser ?"
+puts "Please type 'creator' or 'guesser' to answer the above question:"
 mastermind = Mastermind.new(12)
-mastermind.play_against_computer
+answer = gets.chomp.downcase
+answer == "creator" ? mastermind.creator : mastermind.guesser
