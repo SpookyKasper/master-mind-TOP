@@ -33,7 +33,7 @@ class Mastermind
     puts 'You have 12 tries, good luck!'
   end
 
-  def get_user_input
+  def user_guess
     valid = false
     until valid
       puts
@@ -50,6 +50,12 @@ class Mastermind
         puts 'Like so: yellow orange blue green'
       end
     end
+    guess
+  end
+
+  def computer_guess
+    guess = @colors.sample(4)
+    @guesses_array << guess
     guess
   end
 
@@ -80,10 +86,10 @@ class Mastermind
     end
   end
 
-  def guesser
+  def player_gueser
     print_intro
     until gameover?
-      guess = get_user_input
+      guess = user_guess
       feedback = compare_guess_with_code(guess, @computer_code)
       @guesses_left -= 1
       display_sofar
@@ -99,12 +105,14 @@ class Mastermind
     puts "Coool! then let's get to it!"
     puts 'Please pick four colors for your secret code'
     puts "Remember the colors are #{@colors}"
-    gets.chomp.downcase.split
+    @user_code = gets.chomp.downcase.split
   end
 
-  def creator
-    code = gen_user_code
-
+  def player_creator
+    gen_user_code
+    guess = computer_guess
+    compare_guess_with_code(guess, @user_code)
+    p @feedbacks_array
   end
 end
 
@@ -129,6 +137,6 @@ puts "Please type 'creator' or 'guesser' to answer the above question:"
 
 mastermind = Mastermind.new(12)
 answer = gets.chomp.downcase
-answer == "creator" ? mastermind.creator : mastermind.guesser
+answer == "creator" ? mastermind.player_creator : mastermind.player_gueser
 
 
