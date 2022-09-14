@@ -114,6 +114,21 @@ puts "Let's play mastermind!"
 puts
 puts "Do you want to be the creator of the secret code ? or the guesser ?"
 puts "Please type 'creator' or 'guesser' to answer the above question:"
+
+# Algorythm for computer guesser,
+# I will start with just the first 2 guesses
+# First computer selects 4 random colors for the first guess
+# Then it makes it's second guess depending on the feedback
+# For every '2' in the feedback, he will pick one color
+# from the previous guess and put it in the same place
+# for every '1' in the feedback, he will pick one color and put it in
+# a different place, and for every '0' in the feedback he will pick
+# a color that was not included in the previous guess
+
+
+
 mastermind = Mastermind.new(12)
 answer = gets.chomp.downcase
 answer == "creator" ? mastermind.creator : mastermind.guesser
+
+
