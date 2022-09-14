@@ -80,7 +80,7 @@ class Mastermind
     index = 0
     puts
     while index < @guesses_array.length
-      puts "Your pair guess & feedback for guess #{index + 1} was " +
+      puts "The pair guess & feedback for guess #{index + 1} is " +
            @guesses_array[index].to_s + ' ' + @feedbacks_array[index].to_s
       index += 1
     end
@@ -110,9 +110,16 @@ class Mastermind
 
   def player_creator
     gen_user_code
-    guess = computer_guess
-    compare_guess_with_code(guess, @user_code)
-    p @feedbacks_array
+    until gameover?
+      guess = computer_guess
+      feedback = compare_guess_with_code(guess, @user_code)
+      @guesses_left -= 1
+      display_sofar
+      if feedback.all?(2)
+        puts 'The computer cracked the code!!!'
+          @code_cracked = true
+      end
+    end
   end
 end
 
