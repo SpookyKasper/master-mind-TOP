@@ -9,12 +9,12 @@ class Mastermind
     @computer_code = nil
     @user_code = nil
     @current_guess = nil
-    @current_feedback = []
+    @current_feedback = Array.new(4, 0)
     @guesses_array = []
     @feedbacks_array = []
   end
 
-  def print_intro
+  def print_instruction
     puts 'Instructions:'
     puts 'Please make your guess using a combination of 4 colors seperated with spaces'
     puts 'Example: orange yellow blue white'
@@ -36,6 +36,20 @@ class Mastermind
     puts 'You have 12 tries, good luck!'
   end
 
+  def print_guess_request
+    puts
+    puts "You have #{@guesses_left} guesses left"
+    puts "Remember, the possible colors are: #{@colors}"
+    puts
+    puts "So darling what is your #{@chances - @guesses_left + 1} guess ?"
+  end
+
+  def print_wrong_input
+    puts
+    puts 'Mmh something is wrong with your input, please type 4 colors seperated with spaces'
+    puts 'Like so: yellow orange blue blue'
+  end
+
   def gen_user_code
     puts
     puts "Coool! then let's get to it!"
@@ -51,24 +65,19 @@ class Mastermind
     code
   end
 
+  def guess_valid?(guess)
+      guess.all? { |color| @colors.include?(color) } && guess.length == 4
+  end
+
   def get_user_guess
-    valid = false
-    until valid
-      puts
-      puts "You have #{@guesses_left} guesses left"
-      puts "Remember, the possible colors are: #{@colors}"
-      puts
-      puts "So darling what is your #{@chances - @guesses_left + 1} guess ?"
+    time_to_stop = false
+    until time_to_stop
+      print_guess_request
       guess = gets.chomp.downcase.split
-      if guess.all? { |color| @colors.include?(color) } && guess.length == 4
-        @current_guess = guess
-        @guesses_array << guess
-        valid = true
-      else
-        puts
-        puts 'Mmh something is wrong with your input, please type 4 colors seperated with spaces'
-        puts 'Like so: yellow orange blue green'
-      end
+      next print_wrong_input unless guess_valid?(guess)
+      @current_guess = guess
+      @guesses_array << guess
+      time_to_stop = true
     end
   end
 
@@ -91,18 +100,17 @@ class Mastermind
 
   def compare_guess_with_code(guess, code)
     tempo_guess = guess.map {|v| v = v}
-    code.each_with_index do |color, i|
+    @current_feedback = code.map.with_index do |color, i|
       if tempo_guess[i] == color
-        @current_feedback[i] = 2
         tempo_guess[i] == "checked"
+        2
       elsif tempo_guess.include?(color)
-        @current_feedback[i] = 1
         index = tempo_guess.find_index {|v| v == color}
         tempo_guess[index] = "checked"
+        1
       else
-        @current_feedback[i] = 0
+        0
       end
-      p tempo_guess
     end
     @feedbacks_array << @current_feedback
   end
@@ -121,10 +129,10 @@ class Mastermind
   end
 
   def player_guesser
-    print_intro
+    print_instruction
     gen_computer_code
     until gameover?
-      get_user_guess
+      guess = get_user_guess
       compare_guess_with_code(@current_guess, @computer_code)
       @guesses_left -= 1
       display_sofar
