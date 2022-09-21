@@ -1,11 +1,12 @@
 
 class Mastermind
 
-  def initialize(chances)
+  COLORS = %w[yellow orange purple blue white cyan]
+  TURNS = 12
+
+  def initialize
     @code_cracked = false
-    @chances = chances
-    @guesses_left = chances
-    @colors = %w[yellow orange purple blue white cyan]
+    @guesses_left = TURNS
     @computer_code = nil
     @user_code = nil
     @current_guess = nil
@@ -39,9 +40,9 @@ class Mastermind
   def print_guess_request
     puts
     puts "You have #{@guesses_left} guesses left"
-    puts "Remember, the possible colors are: #{@colors}"
+    puts "Remember, the possible colors are: #{COLORS}"
     puts
-    puts "So darling what is your #{@chances - @guesses_left + 1} guess ?"
+    puts "So darling what is your #{TURNS - @guesses_left + 1} guess ?"
   end
 
   def print_wrong_input
@@ -54,19 +55,18 @@ class Mastermind
     puts
     puts "Coool! then let's get to it!"
     puts 'Please pick four colors for your secret code'
-    puts "Remember the colors are #{@colors}"
+    puts "Remember the colors are #{COLORS}"
     @user_code = gets.chomp.downcase.split
   end
 
   def gen_computer_code
     code = []
-    4.times {code << @colors.sample}
+    4.times {code << COLORS.sample}
     @computer_code = code
-    code
   end
 
   def guess_valid?(guess)
-      guess.all? { |color| @colors.include?(color) } && guess.length == 4
+      guess.all? { |color| COLORS.include?(color) } && guess.length == 4
   end
 
   def get_user_guess
@@ -87,7 +87,7 @@ class Mastermind
     # for every 2 in the feedback put a color in the same place
     # for every 1 in the feedback
     if @guesses_array.empty?
-      guess = @colors.sample(4)
+      guess = COLORS.sample(4)
       @guesses_array << guess
     else
       @guesses_array.reduce() do |memo, (element, index)|
@@ -165,7 +165,7 @@ puts
 puts "Do you want to be the creator of the secret code ? or the guesser ?"
 puts "Please type 'creator' or 'guesser' to answer the above question:"
 
-mastermind = Mastermind.new(12)
+mastermind = Mastermind.new
 stop = false
 until stop
   answer = gets.chomp.downcase
