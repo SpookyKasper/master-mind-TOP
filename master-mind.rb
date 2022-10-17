@@ -2,17 +2,17 @@
 class Mastermind
 
   COLORS = %w[yellow orange purple blue white cyan]
-  TURNS = 12
+  TURNS = 3
 
   def initialize
     @code_cracked = false
     @guesses_left = TURNS
-    @computer_code = nil
-    @user_code = nil
+    @code = nil
     @current_guess = nil
-    @current_feedback = Array.new(4, 0)
+    @current_feedback = nil
     @guesses_array = []
     @feedbacks_array = []
+    @previous_pairs = {}
   end
 
   def print_instruction
@@ -45,28 +45,37 @@ class Mastermind
     puts "So darling what is your #{TURNS - @guesses_left + 1} guess ?"
   end
 
+  def print_code_request
+    puts
+    puts 'Please pick four colors for your secret code'
+    puts "Remember the possible colors are #{COLORS}"
+  end
+
   def print_wrong_input
     puts
     puts 'Mmh something is wrong with your input, please type 4 colors seperated with spaces'
     puts 'Like so: yellow orange blue blue'
   end
 
-  def gen_user_code
-    puts
-    puts "Coool! then let's get to it!"
-    puts 'Please pick four colors for your secret code'
-    puts "Remember the colors are #{COLORS}"
-    @user_code = gets.chomp.downcase.split
+  def set_user_code
+    time_to_stop = false
+    until time_to_stop
+      print_code_request
+      code = gets.chomp.downcase.split
+      next print_wrong_input unless valid_input?(code)
+      @code = code
+      time_to_stop = true
+    end
   end
 
-  def gen_computer_code
-    code = []
-    4.times {code << COLORS.sample}
-    @computer_code = code
+  def gen_color_combination
+    combination = []
+    4.times {combination << COLORS.sample}
+    combination
   end
 
-  def guess_valid?(guess)
-      guess.all? { |color| COLORS.include?(color) } && guess.length == 4
+  def valid_input?(input)
+      input.all? { |color| COLORS.include?(color) } && input.length == 4
   end
 
   def get_user_guess
@@ -74,28 +83,69 @@ class Mastermind
     until time_to_stop
       print_guess_request
       guess = gets.chomp.downcase.split
-      next print_wrong_input unless guess_valid?(guess)
+      next print_wrong_input unless valid_input?(guess)
       @current_guess = guess
       @guesses_array << guess
       time_to_stop = true
     end
   end
 
-  def computer_guess
-    # make the computer adapt to the feedback
-    # after making a first random guess
-    # for every 2 in the feedback put a color in the same place
-    # for every 1 in the feedback
-    if @guesses_array.empty?
-      guess = COLORS.sample(4)
-      @guesses_array << guess
-    else
-      @guesses_array.reduce() do |memo, (element, index)|
-        correct_gems = feedbacks_array[index].count(2)
-        p correct_gems
+  def does_guess_match_feedback?(guess, feedback)
+    # for every 2 in the feedback there must be a color at the same place in the guess
+    # for every 1 in the feedback that color must be present in the guess
+    # for every 0 in the feedback there must be a color not present in the guess
+    exact = feedback.count(2)
+    almost = feedback.count(1)
+    nope = feedback.count(0)
+    # compare guess and feedback and count how many are exact matches
+
+  end
+
+
+  def gen_possible_solution
+    keepgoing = true
+    while keepgoing
+      # compare option to guess + feedback pair
+      # if feedback says 2 option gets the same color
+      # if feedback says 1 pick another color from the guess
+      # if feedback says 0 pick a color not present in guess
+      index = 0
+      result = []
+      @feedbacks_array.each do |feedback|
+        feedback.each_with_index do |num, i|
+          current_guess = @guesses_array[index]
+          color = current_guess[i]
+          if num == 2
+            result << color
+            color = "check"
+          elsif num == 1
+            left = current_guess.select {|v| v != "check"}
+            result << left.sample
+          elsif num == 0
+            options = COLORS - current_guess
+            result << options.sample
+          end
+        end
+        keepgoing = false
+        index += 1
       end
     end
-    guess
+    p result
+    result
+  end
+
+  def gen_computer_guess
+    if @guesses_array.empty?
+      @current_guess = gen_color_combination
+    else
+      # second guess varies until it matches the feedback of the pair guess + feedback
+      # example previous guess is orange orange blue blue, feedback is [2,1,0,0]
+      # new guess must have one color in the same place, 1 color moving places and 2 new colors
+      # until it is true for all guesses keep changing colors.f
+      @current_guess = gen_possible_solution
+
+    end
+    @guesses_array << @current_guess
   end
 
   def compare_guess_with_code(guess, code)
@@ -121,7 +171,7 @@ class Mastermind
 
   def display_sofar
     puts
-    p @computer_code
+    p @code
     @guesses_array.each_with_index do |guess, index|
       puts "The pair guess & feedback for guess #{index + 1} is " +
             @guesses_array[index].to_s + ' ' + @feedbacks_array[index].to_s
@@ -130,30 +180,28 @@ class Mastermind
 
   def player_guesser
     print_instruction
-    gen_computer_code
+    @code = gen_color_combination
     until gameover?
-      guess = get_user_guess
-      compare_guess_with_code(@current_guess, @computer_code)
+      get_user_guess
+      compare_guess_with_code(@current_guess, @code)
       @guesses_left -= 1
       display_sofar
-      if @current_feedback.join == '2222'
-        puts 'Congratulations!! you cracked the code!!!'
-          @code_cracked = true
-      end
+      next unless @current_feedback.join == '2222'
+      puts 'Congratulations!! you cracked the code!!!'
+      code_cracked = true
     end
   end
 
   def player_creator
-    gen_user_code
+    set_user_code
     until gameover?
-      guess = computer_guess
-      feedback = compare_guess_with_code(guess, @user_code)
+      gen_computer_guess
+      feedback = compare_guess_with_code(@current_guess, @code)
       @guesses_left -= 1
       display_sofar
-      if feedback.all?(2)
-        puts 'The computer cracked the code!!!'
-          @code_cracked = true
-      end
+      next unless @current_feedback.join == '2222'
+      puts 'The computer cracked the code!!!'
+      @code_cracked = true
     end
   end
 end
@@ -167,6 +215,9 @@ puts "Please type 'creator' or 'guesser' to answer the above question:"
 
 mastermind = Mastermind.new
 stop = false
+
+mastermind.player_creator
+
 until stop
   answer = gets.chomp.downcase
   case answer
@@ -180,4 +231,3 @@ until stop
     puts "Please input creator or guesser"
   end
 end
-
