@@ -9,6 +9,12 @@ module Colors
   def print_colors
     puts "Here are the possible colors, #{COLORS}"
   end
+
+  def gen_color_combination(num)
+    combi = []
+    num.times {combi << COLORS.sample}
+    combi
+  end
 end
 
 class Creator
@@ -21,7 +27,7 @@ class Creator
   end
 
   def gen_solution
-    4.times {@solution << COLORS.sample}
+    @solution = gen_color_combination(4)
   end
 
   def print_solution
@@ -30,6 +36,8 @@ class Creator
 end
 
 class Guesser
+
+  attr_reader :guess
 
   include Colors
 
@@ -54,7 +62,12 @@ class Combination
     @color2 = color2
     @color3 = color3
     @color4 = color4
+    @combination = []
   end
+
+  def gen_combination
+  end
+
 end
 
 class Feedback
@@ -66,7 +79,7 @@ class Feedback
 
   def give_result
     @guess.each_with_index do |color, index|
-      if @solution[index] == color then @result << 2 and @solution[index] = "check"
+      if @solution[index] == color then @result << 2 and @solution[index] = "check" end
     end
     @guess.each {|color| if @solution.include?(color) then @result << 1 end}
     until @result.length == 4 do @result << 0 end
@@ -96,14 +109,5 @@ p possible_codes.length
 
 puts "Hello Master Mind Player!! How should I call you ?"
 name = gets.chomp
-daniel = Guesser.new(name)
-computer = Creator.new("Computer")
-
-daniel.get_guess
-daniel.print_guess
-daniel.print_colors
-computer.gen_solution
-computer.print_solution
-
-
-end
+guesser = Guesser.new(name)
+creator = Creator.new("computer")
