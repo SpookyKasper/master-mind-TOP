@@ -25,25 +25,33 @@ class Mastermind
   end
 
   def get_feedback(guess, solution)
-    copy = solution.map {|v| v = v}
+    solution_copy = solution.map {|v| v = v}
     feedback = []
+    # guess.each_with_index do |color, index|
+    #   if solution_copy.include?(color)
+    #     i = solution_copy.index(color)
+    #     guess[i] == solution_copy[i] || guess[index] == solution_copy[index] ? feedback << 2 : feedback << 1
+    #     solution_copy[i] = "check"
+    #   else
+    #     feedback << 0
+    #   end
+    # end
     guess.each_with_index do |color, index|
-      if copy.include?(color)
-        i = copy.index(color)
-        guess[i] == copy[i] || guess[index] == copy[index] ? feedback << 2 : feedback << 1
-        copy[i] = "check"
-      else
-        feedback << 0
-      end
+      if solution_copy[index] == color then feedback << 2 and solution_copy[index] = "check" end
     end
-    p copy
+    guess.each_with_index do |color, index|
+      ind = solution_copy.index(color)
+      if solution_copy.include?(color) then feedback << 1 and solution_copy[ind] = "check" end
+    end
+    until feedback.length == 4
+      feedback << 0
+    end
     feedback
   end
 
   def gen_guess_depending_on_feedback(guess, feedback)
     guess_copy = guess.map {|v| v = v}
     current_guess = []
-    colors_left = COLORS - guess
     feedback.map.with_index do |num, index|
       case num
       when 0
@@ -92,9 +100,9 @@ class Mastermind
       guess = @previous_guesses[turn]
       feedback = @previous_feedbacks[turn]
       current_guess = gen_guess_depending_on_feedback(guess, feedback)
-      until current_guess_passes_test?(current_guess, guess, feedback)
-        current_guess = gen_guess_depending_on_feedback(guess, feedback)
-      end
+      # until current_guess_passes_test?(current_guess, guess, feedback)
+      #   current_guess = gen_guess_depending_on_feedback(guess, feedback)
+      # end
       current_guess
     end
   end

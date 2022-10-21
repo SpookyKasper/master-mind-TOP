@@ -1,8 +1,3 @@
-# Algo:
-# Make the computer generate a code
-# Ask the user for a guess
-# Give Feedback on that guess
-
 module Colors
   COLORS = %w[yellow orange blue green white cyan]
 
@@ -15,77 +10,109 @@ module Colors
     num.times {combi << COLORS.sample}
     combi
   end
+
 end
 
-class Creator
+class HumanPlayer
+
+  attr_accessor :name
 
   include Colors
 
   def initialize(name)
     @name = name
-    @solution = []
+    @combination = []
   end
 
-  def gen_solution
-    @solution = gen_color_combination(4)
+  def get_player(solution_or_guess)
+    puts "Hello #{@name}, please input your #{solution_or_guess}!"
+    @combination = gets.chomp.split
   end
 
-  def print_solution
-    puts "The solution is #{@solution}"
+  def print_combination
+    puts "The combination is #{@combination}"
   end
+
 end
 
-class Guesser
+class CopmuterPlayer
 
-  attr_reader :guess
+  attr_reader :combination
 
   include Colors
 
-  def initialize(name)
-    @name = name
-    @guess = []
-  end
-
-  def get_guess
-    puts "Hello #{@name}, please input your guess!"
-    @guess = gets.chomp.split
-  end
-
-  def print_guess
-    puts "Your guess was #{@guess}"
-  end
-end
-
-class Combination
-  def initialize(color1, color2, color3, color4)
-    @color1 = color1
-    @color2 = color2
-    @color3 = color3
-    @color4 = color4
+  def initialize
     @combination = []
   end
 
   def gen_combination
+    @combination = gen_color_combination(4)
+  end
+
+  def print_combination
+    puts "The combination is #{@combination}"
   end
 
 end
 
 class Feedback
+
+  attr_reader :feedback
+
   def initialize(guess, solution)
-    @guess = guess
-    @solution = solution
-    @result = []
+    @guess = guess.map {|v| v = v}
+    @solution = solution.map {|v| v = v}
+    @feedback = []
   end
 
-  def give_result
+  def gen_result
     @guess.each_with_index do |color, index|
-      if @solution[index] == color then @result << 2 and @solution[index] = "check" end
+      if @solution[index] == color then @feedback << 2 and @solution[index] = "check" and @guess[index] = "check" end
+      p @solution
+      p @guess
     end
-    @guess.each {|color| if @solution.include?(color) then @result << 1 end}
-    until @result.length == 4 do @result << 0 end
+    @guess.each {|color| if @solution.include?(color) then @feedback << 1 and @solution[@solution.index(color)] = "check" and color = "check" end}
+    until @feedback.length == 4 do @feedback << 0 end
+  end
+
+  def print_feedback
+    puts "The feedback is #{@feedback}"
   end
 end
 
+class MastermindGuesser
+
+  attr_reader :guess, :solution
+
+  def initialize
+    @guesser = HumanPlayer.new("player1")
+    @creator = CopmuterPlayer.new
+    @solution = @creator.gen_combination
+    @guess = []
+    @feedback = []
+  end
+
+  def set_player_name
+    puts "Hello player1 how should I call you ?"
+    @guesser.name = gets.chomp
+  end
+
+  def gen_feedback
+    feedback = Feedback.new(@guess, @solution)
+    feedback.gen_result
+    @feeback = feedback.feedback
+  end
+
+  def play
+    set_player_name
+    @guess = @guesser.get_player("guess")
+    gen_feedback
+    p @feeback
+  end
+end
+
+class MastermindCreator
+end
 
 possible_codes = []
 
@@ -96,18 +123,18 @@ for num in (1111..6666)
   end
 end
 
-def feedback_giver(guess, solution)
-
-end
-
 possible_codes.each do |code|
   p code
 end
 
 p possible_codes.length
 
+my_game = MastermindGuesser.new
+my_game.play
+puts "This is the solution #{my_game.solution}"
+puts "This is the guess #{my_game.guess}"
+p my_game.guess
 
-puts "Hello Master Mind Player!! How should I call you ?"
-name = gets.chomp
-guesser = Guesser.new(name)
-creator = Creator.new("computer")
+
+
+
