@@ -100,7 +100,7 @@ class MastermindGuesser
 
   attr_reader :guess, :solution
 
-  TURNS = 2
+  TURNS = 3
 
   def initialize
     @guesser = HumanPlayer.new("player1")
@@ -108,7 +108,7 @@ class MastermindGuesser
     @solution = @creator.gen_combination
     @guess = []
     @feedback = []
-    @turns_left = TURNS
+    @turn = 0
   end
 
   def set_player_name
@@ -131,20 +131,28 @@ class MastermindGuesser
     puts "This is the solution #{@solution}"
     puts "This is the guess #{@guess}"
     puts "This is the feedback #{@feedback}"
-    puts "You have #{@turns_left} guesses left"
+    puts "You have #{TURNS - @turn} guesses left"
   end
 
   def victory
   @feedback.join == "2222"
   end
 
+  def print_victory_text
+    puts "Congratulations you cracked the code in #{@turn} turns!"
+  end
+
+  def print_end_text
+    puts "You run out of guesses this time! Wanna try another game ?"
+  end
+
   def turns_loop
-    until @turns_left == 0 || victory
+    until @turn == TURNS || victory
       get_guess_and_gen_feedback
-      @turns_left -= 1
+      @turn += 1
       print_info
     end
-    victory ? (puts "Congrats! You cracked the code!") : (puts "You run out of guesses this time! Wanna try another game ?")
+    victory ? print_victory_text : print_end_text
   end
 
   def play
