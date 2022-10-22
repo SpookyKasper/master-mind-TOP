@@ -25,7 +25,7 @@ class HumanPlayer
   end
 
   def get_player(solution_or_guess)
-    puts "Hello #{@name}, please input your #{solution_or_guess}!"
+    puts "So #{@name}, please input your #{solution_or_guess}!"
     @combination = gets.chomp.split
   end
 
@@ -100,7 +100,7 @@ class MastermindGuesser
 
   attr_reader :guess, :solution
 
-  TURNS = 12
+  TURNS = 2
 
   def initialize
     @guesser = HumanPlayer.new("player1")
@@ -144,6 +144,7 @@ class MastermindGuesser
       @turns_left -= 1
       print_info
     end
+    victory ? (puts "Congrats! You cracked the code!") : (puts "You run out of guesses this time! Wanna try another game ?")
   end
 
   def play
@@ -173,9 +174,6 @@ p possible_codes.length
 
 my_game = MastermindGuesser.new
 my_game.play
-puts "This is the solution #{my_game.solution}"
-puts "This is the guess #{my_game.guess}"
-p my_game.guess
 
 
 
