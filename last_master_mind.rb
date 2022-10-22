@@ -65,13 +65,29 @@ class Feedback
     @feedback = []
   end
 
-  def gen_result
+  def find_exact
     @guess.each_with_index do |color, index|
-      if @solution[index] == color then @feedback << 2 and @solution[index] = "check" and @guess[index] = "check" end
-      p @solution
-      p @guess
+      if @solution[index] == color
+        @feedback << 2
+        @solution[index] = "check"
+        @guess[index] = "done"
+      end
     end
-    @guess.each {|color| if @solution.include?(color) then @feedback << 1 and @solution[@solution.index(color)] = "check" and color = "check" end}
+  end
+
+  def find_almost
+    @guess.each do |color|
+      if @solution.include?(color)
+        @feedback << 1
+        @solution[@solution.index(color)] = "check"
+        color = "done"
+      end
+    end
+  end
+
+  def gen_result
+    find_exact
+    find_almost
     until @feedback.length == 4 do @feedback << 0 end
   end
 
@@ -84,12 +100,15 @@ class MastermindGuesser
 
   attr_reader :guess, :solution
 
+  TURNS = 12
+
   def initialize
     @guesser = HumanPlayer.new("player1")
     @creator = CopmuterPlayer.new
     @solution = @creator.gen_combination
     @guess = []
     @feedback = []
+    @turns_left = TURNS
   end
 
   def set_player_name
@@ -100,15 +119,38 @@ class MastermindGuesser
   def gen_feedback
     feedback = Feedback.new(@guess, @solution)
     feedback.gen_result
-    @feeback = feedback.feedback
+    @feedback = feedback.feedback
+  end
+
+  def get_guess_and_gen_feedback
+    @guess = @guesser.get_player("guess")
+    gen_feedback
+  end
+
+  def print_info
+    puts "This is the solution #{@solution}"
+    puts "This is the guess #{@guess}"
+    puts "This is the feedback #{@feedback}"
+    puts "You have #{@turns_left} guesses left"
+  end
+
+  def victory
+  @feedback.join == "2222"
+  end
+
+  def turns_loop
+    until @turns_left == 0 || victory
+      get_guess_and_gen_feedback
+      @turns_left -= 1
+      print_info
+    end
   end
 
   def play
     set_player_name
-    @guess = @guesser.get_player("guess")
-    gen_feedback
-    p @feeback
+    turns_loop
   end
+
 end
 
 class MastermindCreator
