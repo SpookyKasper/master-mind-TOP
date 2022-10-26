@@ -67,7 +67,7 @@ class Mastermind
 
   include Colors
 
-  TURNS = 8
+  TURNS = 12
 
   def initialize(name)
     @name = name
@@ -80,6 +80,7 @@ class Mastermind
   end
 
   def get_combination(solution_or_guess)
+    puts "Remember here are the possible colors #{COLORS}"
     puts "So #{@name}, please input your #{solution_or_guess}!"
     gets.chomp.split
   end
@@ -102,10 +103,11 @@ class Mastermind
   end
 
   def print_info
-    puts "This is the solution #{@solution}"
+    puts
     puts "This was the guess #{@guess}"
     puts "This is the feedback #{@feedback}"
     puts "You have #{TURNS - @turn} guesses left"
+    puts
   end
 
   def victory?
@@ -113,7 +115,7 @@ class Mastermind
   end
 
   def print_victory_text
-    puts "Congratulations you cracked the code in #{@turn} turns!"
+    puts "Congratulations code was cracked in #{@turn} turns!"
   end
 
   def print_end_text
@@ -134,11 +136,8 @@ class Mastermind
   def play_creator
     @solution = get_combination('code')
     until @turn == TURNS || victory?
-      p @set.length
       @guess = gen_guess
       @feedback = gen_feedback(@guess, @solution)
-      p @possible_codes.length
-      p @set.length
       @turn += 1
       print_info
     end
@@ -146,11 +145,9 @@ class Mastermind
   end
 end
 
-# puts "I hear you are here to play Mastermind !?"
-# puts "So let's go! before we start do you want to be the creator or the guesser ?"
-# choice = gets.chomp
-# puts "Cool!, now tell me your name please"
-# my_game = Mastermind.new(gets.chomp)
-# choice == 'creator' ? my_game.play_creator : my_game.play_guesser
-my_mastermind = Mastermind.new('Daniel')
-my_mastermind.play_creator
+puts 'I hear you are here to play Mastermind !?'
+puts "So let's go! before we start do you want to be the creator or the guesser ?"
+choice = gets.chomp
+puts 'Cool!, now tell me your name please'
+my_game = Mastermind.new(gets.chomp)
+choice == 'creator' ? my_game.play_creator : my_game.play_guesser
